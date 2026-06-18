@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shift Widget</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* ---------- Brand tokens ---------- */
+  :root {
+    --crimson:     #C41230;
+    --crimson-900: #8A0B20;
+    --crimson-700: #D42A47;
+    --crimson-50:  #FDF0F2;
+    --cream:       #FFF9F0;
+    --warm-white:  #FFFDFB;
+    --teal:        #2A7B88;
+    --teal-50:     #E6F4F6;
+    --gold:        #E8A832;
+    --gold-50:     #FEF6E4;
+    --sage:        #5A8A5C;
+    --sage-50:     #EDF5ED;
+    --ink:         #2C1810;
+    --slate:       #6D6460;
+    --line:        #E8E2DC;
+    --alu:         #F5F1ED;
+    --surface:     #FFFFFF;
+    --radius:      20px;
+    --shadow:      0 16px 48px -16px rgba(44,24,16,.35);
+    --display:     'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --body:        'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  html, body {
+    margin: 0;
+    background: transparent;
+    font-family: var(--body);
+    -webkit-font-smoothing: antialiased;
+    color: var(--ink);
+  }
+
+  /* ---------- Layout ---------- */
+  .widget {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    border: 1px solid rgba(232,226,220,.9);
+  }
+
+  /* ---------- Header ---------- */
+  .hdr {
+    background: linear-gradient(140deg, var(--crimson), var(--crimson-900));
+    color: #fff;
+    padding: 20px 20px 22px;
+    position: relative;
+  }
+  .hdr::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(120% 90% at 100% 0%, rgba(232,168,50,.22), transparent 50%);
+    pointer-events: none;
+  }
+  .hdr-top { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
+  .mark {
+    width: 40px; height: 40px; border-radius: 12px; flex: none;
+    display: grid; place-items: center;
+    background: rgba(255,255,255,.14);
+  }
+  .mark svg { width: 22px; height: 22px; }
+  .who { line-height: 1.25; }
+  .who .greet { font-size: 12px; opacity: .72; font-weight: 500; letter-spacing: .2px; }
+  .who .name { font-size: 17px; font-weight: 800; font-family: var(--display); letter-spacing: -.2px; }
+  .who .unit { font-size: 12px; opacity: .82; font-weight: 500; margin-top: 1px; }
+
+  /* ---------- Body ---------- */
+  .body { padding: 16px; }
+
+  /* ---------- Today tile ---------- */
+  .today {
+    display: flex; align-items: center; gap: 13px;
+    background: var(--crimson-50);
+    border: 1px solid #F5D7DC;
+    border-radius: 16px; padding: 15px 16px;
+    position: relative; overflow: hidden;
+  }
+  .today::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--gold); }
+  .today-ic {
+    width: 44px; height: 44px; border-radius: 12px; flex: none;
+    background: #fff; display: grid; place-items: center;
+    box-shadow: 0 5px 12px -5px rgba(196,18,48,.25);
+  }
+  .today-ic svg { width: 22px; height: 22px; stroke: var(--crimson); }
+  .today-txt { flex: 1; min-width: 0; }
+  .today-txt .k { font-size: 10.5px; color: var(--slate); font-weight: 700; text-transform: uppercase; letter-spacing: .6px; }
+  .today-txt .v { font-size: 16px; font-weight: 800; font-family: var(--display); letter-spacing: -.3px; margin-top: 1px; color: var(--ink); }
+  .today-txt .loc { font-size: 12px; color: var(--slate); font-weight: 500; margin-top: 2px; }
+  .today-tag {
+    flex: none; align-self: flex-start;
+    font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 7px;
+    text-transform: uppercase; letter-spacing: .4px;
+  }
+
+  /* ---------- Section heads ---------- */
+  .sec-h { display: flex; align-items: center; justify-content: space-between; margin: 20px 2px 10px; }
+  .sec-h h3 { margin: 0; font-size: 13px; font-weight: 700; font-family: var(--display); color: var(--ink); }
+  .sec-h .count {
+    font-size: 11px; font-weight: 700; color: var(--crimson);
+    background: var(--crimson-50); padding: 3px 9px; border-radius: 20px;
+  }
+
+  .empty { font-size: 13px; color: var(--slate); text-align: center; padding: 14px; font-weight: 500; }
+
+  /* ---------- Shift cards ---------- */
+  .shift {
+    display: flex; align-items: center; gap: 12px;
+    border: 1px solid var(--line); border-radius: 14px;
+    padding: 13px; margin-bottom: 10px;
+    transition: border-color .2s ease, transform .25s ease, opacity .25s ease;
+  }
+  .shift .date {
+    width: 48px; height: 52px; flex: none; border-radius: 11px;
+    background: var(--crimson-50); display: grid; place-items: center; text-align: center;
+  }
+  .shift .date .mo { font-size: 10px; font-weight: 800; color: var(--crimson); text-transform: uppercase; letter-spacing: .5px; }
+  .shift .date .dy { font-size: 19px; font-weight: 800; line-height: 1; color: var(--ink); }
+  .shift .meta { flex: 1; min-width: 0; }
+  .shift .meta .t1 { font-size: 14px; font-weight: 700; }
+  .shift .meta .t2 { font-size: 12px; color: var(--slate); font-weight: 500; margin-top: 2px; }
+  .shift .meta .tag {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 2px 7px; border-radius: 6px; margin-top: 6px;
+    text-transform: uppercase; letter-spacing: .4px;
+  }
+  .tag.open    { background: var(--gold-50);  color: #8B6A10; }
+  .tag.mid     { background: var(--teal-50);  color: #1B5E6A; }
+  .tag.close   { background: #EDE4F0;         color: #5C3A6E; }
+
+  .mini {
+    border: 0; cursor: pointer; flex: none;
+    font-family: var(--body); font-weight: 700; font-size: 12.5px;
+    padding: 9px 13px; border-radius: 10px;
+    background: var(--crimson); color: #fff;
+    transition: transform .12s ease, opacity .2s ease;
+  }
+  .mini:active { transform: scale(.94); }
+  .mini.ghost { background: var(--gold); color: var(--ink); }
+  .mini.posted { background: #EDE8E4; color: var(--slate); cursor: default; }
+
+  .note { font-size: 12px; color: var(--slate); text-align: center; padding: 6px 8px 2px; line-height: 1.5; }
+
+  /* ---------- Toast ---------- */
+  .toast {
+    position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 30px);
+    background: var(--ink); color: #fff;
+    font-size: 13px; font-weight: 600;
+    padding: 12px 18px; border-radius: 12px;
+    box-shadow: 0 12px 30px -10px rgba(0,0,0,.5);
+    opacity: 0; pointer-events: none; transition: all .35s cubic-bezier(.2,.8,.2,1);
+    z-index: 50; display: flex; align-items: center; gap: 8px; max-width: 90vw;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 380px) {
+    .who .name { font-size: 16px; }
+    .today-txt .v { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+  <main class="widget" role="region" aria-label="Shift planning">
+    <!-- Header -->
+    <header class="hdr">
+      <div class="hdr-top">
+        <div class="mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M3 3h18v18H3z" rx="3" stroke="#fff" stroke-width="1.6" opacity=".3" fill="none"/>
+            <path d="M7 13l3-3 2 2 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="18" cy="7" r="2" fill="#E8A832" opacity=".9"/>
+          </svg>
+        </div>
+        <div class="who">
+          <div class="greet" id="greet">Good morning</div>
+          <div class="name">My Shift</div>
+          <div class="unit">Front End — Registers & Self-Checkout</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="body">
+      <!-- Today's shift -->
+      <div class="today">
+        <div class="today-ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        </div>
+        <div class="today-txt">
+          <div class="k">Today's scheduled shift</div>
+          <div class="v">Open · 5:00 AM – 1:30 PM</div>
+          <div class="loc">Front End — Registers & Self-Checkout</div>
+        </div>
+        <span class="today-tag tag open">Open</span>
+      </div>
+
+      <div class="sec-h"><h3>My upcoming shifts</h3></div>
+      <div id="myShifts"></div>
+
+      <div class="sec-h">
+        <h3>Open shift pool</h3>
+        <span class="count" id="poolCount">0 open</span>
+      </div>
+      <div id="pool"></div>
+      <p class="note">Posting drops your shift into the open pool so any qualified associate in your department can pick it up. Your department lead is notified for approval.</p>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"><span id="toastTxt"></span></div>
+
+<script>
+  /* ---------------- State ---------------- */
+  var myShifts = [
+    { id: 's1', mo: 'JUN', dy: '19', title: 'Open · 5:00a – 1:30p',   unit: 'Bakery — Morning Prep & Floor', type: 'open',  posted: false },
+    { id: 's2', mo: 'JUN', dy: '21', title: 'Mid · 11:00a – 7:30p',    unit: 'Deli — Counter & Hot Bar',       type: 'mid',   posted: false },
+    { id: 's3', mo: 'JUN', dy: '24', title: 'Close · 3:00p – 11:00p',  unit: 'Front End — Registers & Self-Checkout', type: 'close', posted: false }
+  ];
+
+  var pool = [
+    { id: 'p1', mo: 'JUN', dy: '20', title: 'Open · 5:00a – 1:30p',   unit: 'Produce — Stocking & Floor',     type: 'open',  from: 'T. Williams, Associate' },
+    { id: 'p2', mo: 'JUN', dy: '22', title: 'Mid · 11:00a – 7:30p',    unit: 'Pharmacy — Register & Consult',  type: 'mid',   from: 'R. Patel, Technician' },
+    { id: 'p3', mo: 'JUN', dy: '23', title: 'Close · 3:00p – 11:00p',  unit: 'Grocery — Stocking & Facing',    type: 'close', from: 'J. Morales, Associate' }
+  ];
+
+  /* ---------------- Helpers ---------------- */
+  function setGreeting() {
+    var h = new Date().getHours();
+    document.getElementById('greet').textContent =
+      h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  }
+  function toast(msg) {
+    var t = document.getElementById('toast');
+    document.getElementById('toastTxt').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._h);
+    t._h = setTimeout(function(){ t.classList.remove('show'); }, 2600);
+  }
+  function tagLabel(type) {
+    return type === 'open' ? 'Open' : type === 'mid' ? 'Mid' : 'Close';
+  }
+
+  /* ---------------- Render ---------------- */
+  function renderMyShifts() {
+    var wrap = document.getElementById('myShifts');
+    wrap.innerHTML = '';
+    myShifts.forEach(function(s) {
+      var el = document.createElement('div');
+      el.className = 'shift';
+      el.innerHTML =
+        '<div class="date"><span class="mo">' + s.mo + '</span><span class="dy">' + s.dy + '</span></div>' +
+        '<div class="meta"><div class="t1">' + s.title + '</div><div class="t2">' + s.unit + '</div>' +
+          '<span class="tag ' + s.type + '">' + tagLabel(s.type) + '</span></div>' +
+        (s.posted
+          ? '<button class="mini posted" disabled>Posted</button>'
+          : '<button class="mini" onclick="postShift(\'' + s.id + '\')">Post</button>');
+      wrap.appendChild(el);
+    });
+  }
+
+  function renderPool() {
+    var wrap = document.getElementById('pool');
+    wrap.innerHTML = '';
+    if (pool.length === 0) {
+      wrap.innerHTML = '<p class="empty">No open shifts right now — check back soon.</p>';
+    }
+    pool.forEach(function(s) {
+      var el = document.createElement('div');
+      el.className = 'shift';
+      el.innerHTML =
+        '<div class="date"><span class="mo">' + s.mo + '</span><span class="dy">' + s.dy + '</span></div>' +
+        '<div class="meta"><div class="t1">' + s.title + '</div><div class="t2">' + s.unit + ' · ' + s.from + '</div>' +
+          '<span class="tag ' + s.type + '">' + tagLabel(s.type) + '</span></div>' +
+        '<button class="mini ghost" onclick="pickUp(\'' + s.id + '\')">Pick up</button>';
+      wrap.appendChild(el);
+    });
+    document.getElementById('poolCount').textContent = pool.length + ' open';
+  }
+
+  /* ---------------- Actions ---------------- */
+  function postShift(id) {
+    var s = myShifts.find(function(x){ return x.id === id; });
+    if (!s || s.posted) return;
+    s.posted = true;
+    pool.unshift({ id: 'pool-' + id, mo: s.mo, dy: s.dy, title: s.title, unit: s.unit, type: s.type, from: 'You' });
+    renderMyShifts();
+    renderPool();
+    toast('Shift posted to the open pool — pending department lead approval.');
+  }
+
+  function pickUp(id) {
+    var idx = pool.findIndex(function(x){ return x.id === id; });
+    if (idx === -1) return;
+    var s = pool[idx];
+    pool.splice(idx, 1);
+    myShifts.push({ id: 'picked-' + s.id, mo: s.mo, dy: s.dy, title: s.title, unit: s.unit, type: s.type, posted: false });
+    myShifts.sort(function(a, b){ return parseInt(a.dy) - parseInt(b.dy); });
+    renderMyShifts();
+    renderPool();
+    toast('You picked up the ' + s.mo + ' ' + s.dy + ' ' + tagLabel(s.type).toLowerCase() + ' shift. Added to your schedule.');
+  }
+
+  /* ---------------- Init ---------------- */
+  setGreeting();
+  renderMyShifts();
+  renderPool();
+</script>
+</body>
+</html>
